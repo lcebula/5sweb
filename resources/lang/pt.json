@@ -1,0 +1,8 @@
+{
+    "login": "Entrar",
+    "email": "Email",
+    "password": "Senha",
+    "loginFailed": "Falha no login. Verifique suas credenciais e tente novamente.",
+    "home": "Início",
+    "logout": "Sair"
+}

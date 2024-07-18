@@ -1,0 +1,8 @@
+{
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "loginFailed": "Login failed. Please check your credentials and try again.",
+    "home": "Home",
+    "logout": "Logout"
+}
