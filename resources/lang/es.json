@@ -4,5 +4,20 @@
     "password": "Contraseña",
     "loginFailed": "Error de inicio de sesión. Verifique sus credenciales y vuelva a intentarlo.",
     "home": "Inicio",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "admin": "Administración",
+    "manageAreas": "Gestionar Áreas",
+    "manageSectors": "Gestionar Sectores",
+    "manageAudits": "Gestionar Auditorías",
+    "manageUsers": "Gestionar Usuarios",
+    "addArea": "Agregar Área",
+    "editArea": "Editar Área",
+    "deleteArea": "Eliminar Área",
+    "confirmDelete": "Confirmar Eliminación",
+    "confirmDeleteMessage": "¿Estás seguro de que deseas eliminar esta área?",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "name": "Nombre",
+    "actions": "Acciones",
+    "delete": "Eliminar"
 }

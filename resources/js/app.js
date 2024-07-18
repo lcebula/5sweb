@@ -1,15 +1,15 @@
-import { createApp } from 'vue';
-import { createRouter, createWebHistory } from 'vue-router';
-import axios from 'axios';
-import Login from './components/Login.vue';
-import Home from './components/Home.vue';
-import App from './components/App.vue';
-import i18n from './i18n';
+// app.js
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
+import { createApp } from 'vue';
+import router from './router';
+import axios from 'axios';
+import App from './components/App.vue';
+import i18n from './i18n';
 import 'flag-icon-css/css/flag-icons.min.css';
+import '@fortawesome/fontawesome-free/css/all.css';
 
-axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+axios.defaults.baseURL = import.meta.env.VITE_API_URL; // Verifique se a baseURL não inclui '/api'
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 axios.defaults.headers.common['Accept'] = 'application/json';
 
@@ -21,28 +21,6 @@ axios.interceptors.request.use(config => {
     return config;
 }, error => {
     return Promise.reject(error);
-});
-
-const routes = [
-    { path: '/', component: Login, name: 'login' },
-    { path: '/home', component: Home, name: 'home' }
-];
-
-const router = createRouter({
-    history: createWebHistory(),
-    routes
-});
-
-router.beforeEach((to, from, next) => {
-    const publicPages = ['/', '/login'];
-    const authRequired = !publicPages.includes(to.path);
-    const loggedIn = localStorage.getItem('token');
-
-    if (authRequired && !loggedIn) {
-        return next('/');
-    }
-
-    next();
 });
 
 const app = createApp(App);

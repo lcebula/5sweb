@@ -4,5 +4,20 @@
     "password": "Senha",
     "loginFailed": "Falha no login. Verifique suas credenciais e tente novamente.",
     "home": "Início",
-    "logout": "Sair"
+    "logout": "Sair",
+    "admin": "Administração",
+    "manageAreas": "Gerenciar Áreas",
+    "manageSectors": "Gerenciar Setores",
+    "manageAudits": "Gerenciar Auditorias",
+    "manageUsers": "Gerenciar Usuários",
+    "addArea": "Adicionar Área",
+    "editArea": "Editar Área",
+    "deleteArea": "Excluir Área",
+    "confirmDelete": "Confirmar Exclusão",
+    "confirmDeleteMessage": "Você tem certeza que deseja excluir esta área?",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "name": "Nome",
+    "actions": "Ações",
+    "delete": "Excluir"
 }

@@ -4,5 +4,20 @@
     "password": "Password",
     "loginFailed": "Login failed. Please check your credentials and try again.",
     "home": "Home",
-    "logout": "Logout"
+    "logout": "Logout",
+    "admin": "Admin",
+    "manageAreas": "Manage Areas",
+    "manageSectors": "Manage Sectors",
+    "manageAudits": "Manage Audits",
+    "manageUsers": "Manage Users",
+    "addArea": "Add Area",
+    "editArea": "Edit Area",
+    "deleteArea": "Delete Area",
+    "confirmDelete": "Confirm Delete",
+    "confirmDeleteMessage": "Are you sure you want to delete this area?",
+    "save": "Save",
+    "cancel": "Cancel",
+    "name": "Name",
+    "actions": "Actions",
+    "delete": "Delete"
 }
