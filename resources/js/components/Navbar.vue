@@ -7,7 +7,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown" v-if="isAdmin">
               <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 {{ $t('admin') }}
               </a>
@@ -28,13 +28,41 @@
   </template>
 
   <script>
+  import axios from 'axios';
+
   export default {
+    data() {
+      return {
+        isAdmin: false,
+      };
+    },
     methods: {
       logout() {
         localStorage.removeItem('token');
         this.$router.push({ name: 'login' });
-      }
-    }
+      },
+      checkAdminRole() {
+        const token = localStorage.getItem('token');
+        if (token) {
+          axios.get('/me', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then(response => {
+            const roles = response.data.roles.map(role => role.name) || [];
+            this.isAdmin = roles.includes('admin');
+          })
+          .catch(error => {
+            console.error('Error fetching user roles:', error);
+            this.isAdmin = false;
+          });
+        }
+      },
+    },
+    created() {
+      this.checkAdminRole();
+    },
   };
   </script>
 
