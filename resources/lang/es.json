@@ -20,5 +20,12 @@
     "name": "Nombre",
     "actions": "Acciones",
     "delete": "Eliminar",
-    "searchAreas": "Buscar áreas..."
-}
+    "searchAreas": "Buscar Áreas...",
+    "addSector": "Agregar Sector",
+    "editSector": "Editar Sector",
+    "deleteSector": "Eliminar Sector",
+    "confirmDeleteSector": "Confirmar Eliminación de Sector",
+    "confirmDeleteSectorMessage": "¿Estás seguro de que deseas eliminar este sector?",
+    "searchSectors": "Buscar Sectores...",
+    "area": "Área"
+  }
