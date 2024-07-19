@@ -1,12 +1,13 @@
 <template>
     <div>
       <Navbar />
+      <LoadingSpinner :isLoading="isLoading" />
       <div class="container mt-4">
         <h1>{{ $t('manageAreas') }}</h1>
         <button class="btn btn-primary mb-3" @click="addArea">
           <i class="fas fa-plus"></i> {{ $t('addArea') }}
         </button>
-        <input type="text" v-model="searchTerm" placeholder="Search areas..." class="form-control mb-3" />
+        <input type="text" v-model="searchTerm" :placeholder="$t('searchAreas')" class="form-control mb-3" />
         <table class="table table-hover">
           <thead>
             <tr>
@@ -77,10 +78,12 @@
   <script>
   import axios from 'axios';
   import Navbar from '../Navbar.vue';
+  import LoadingSpinner from '../LoadingSpinner.vue';
 
   export default {
     components: {
-      Navbar
+      Navbar,
+      LoadingSpinner
     },
     data() {
       return {
@@ -93,7 +96,8 @@
           id: null,
           name: ''
         },
-        deleteAreaId: null
+        deleteAreaId: null,
+        isLoading: false // Adicionar estado de carregamento
       };
     },
     computed: {
@@ -103,12 +107,16 @@
     },
     methods: {
       fetchAreas() {
+        this.isLoading = true; // Ativar carregamento
         this.$axios.get('/areas')
           .then(response => {
             this.areas = response.data;
           })
           .catch(error => {
             console.error(error);
+          })
+          .finally(() => {
+            this.isLoading = false; // Desativar carregamento
           });
       },
       editArea(area) {
@@ -125,6 +133,7 @@
         this.showModal = true;
       },
       saveArea() {
+        this.isLoading = true; // Ativar carregamento
         if (this.isEditMode) {
           this.$axios.put(`/areas/${this.currentArea.id}`, this.currentArea)
             .then(() => {
@@ -133,6 +142,9 @@
             })
             .catch(error => {
               console.error(error);
+            })
+            .finally(() => {
+              this.isLoading = false; // Desativar carregamento
             });
         } else {
           this.$axios.post('/areas', this.currentArea)
@@ -142,6 +154,9 @@
             })
             .catch(error => {
               console.error(error);
+            })
+            .finally(() => {
+              this.isLoading = false; // Desativar carregamento
             });
         }
       },
@@ -150,6 +165,7 @@
         this.showDeleteModal = true;
       },
       deleteArea() {
+        this.isLoading = true; // Ativar carregamento
         this.$axios.delete(`/areas/${this.deleteAreaId}`)
           .then(() => {
             this.fetchAreas();
@@ -157,6 +173,9 @@
           })
           .catch(error => {
             console.error(error);
+          })
+          .finally(() => {
+            this.isLoading = false; // Desativar carregamento
           });
       },
       closeModal() {

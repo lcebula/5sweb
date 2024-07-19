@@ -19,5 +19,6 @@
     "cancel": "Cancel",
     "name": "Name",
     "actions": "Actions",
-    "delete": "Delete"
+    "delete": "Delete",
+    "searchAreas": "Search areas..."
 }

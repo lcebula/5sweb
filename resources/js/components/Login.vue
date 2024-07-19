@@ -42,6 +42,7 @@ export default {
                     password: this.password
                 });
                 localStorage.setItem('token', response.data.token);
+                localStorage.setItem('company_id', response.data.user.company_id); // Guardar a companhia do usuário
                 this.$router.push('/home');
             } catch (error) {
                 console.error(error);
