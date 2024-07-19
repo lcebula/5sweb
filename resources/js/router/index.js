@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import axios from 'axios';
+import store from '../store';
 import Login from '../components/Login.vue';
 import Home from '../components/Home.vue';
 import ManageAreas from '../components/Admin/ManageAreas.vue';
@@ -21,26 +21,6 @@ const router = createRouter({
     routes
 });
 
-// Função para obter o papel do usuário
-async function getUserRole() {
-    const token = localStorage.getItem('token');
-    if (!token) return null;
-
-    try {
-        const response = await axios.get('/me', {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-        const roles = response.data.user.roles || [];
-        return roles.map(role => role.name); // Retorna os nomes dos papéis
-    } catch (error) {
-        console.error('Error fetching user roles:', error);
-        return null;
-    }
-}
-
-// Verificação de autenticação e papel
 router.beforeEach(async (to, from, next) => {
     const publicPages = ['/', '/login'];
     const authRequired = !publicPages.includes(to.path);
@@ -51,9 +31,10 @@ router.beforeEach(async (to, from, next) => {
     }
 
     if (to.meta.requiresRole) {
-        const roles = await getUserRole();
-        if (!roles || !roles.includes(to.meta.requiresRole)) {
-            return next('/home'); // Redireciona para a página inicial se o usuário não tiver o papel adequado
+        await store.dispatch('fetchUser'); // Ensure user is loaded
+        const roles = store.state.roles;
+        if (!roles.includes(to.meta.requiresRole)) {
+            return next('/home'); // Redirect to home if user doesn't have the appropriate role
         }
     }
 

@@ -21,6 +21,7 @@
         "flag-icon-css": "^4.1.7",
         "flag-icons": "^7.2.3",
         "vue-i18n": "^9.13.1",
-        "vue-router": "^4.0.13"
+        "vue-router": "^4.0.13",
+        "vuex": "^4.0.2"
     }
 }
