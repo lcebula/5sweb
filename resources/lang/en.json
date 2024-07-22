@@ -30,5 +30,15 @@
     "delete": "Delete",
     "searchAreas": "Search Areas",
     "searchSectors": "Search Sectors",
-    "searchUsers": "Search Users"
-}
+    "searchUsers": "Search Users",
+    "status": "Status",
+    "pending": "Pending",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "auditDate": "Audit Date",
+    "observations": "Observations",
+    "area": "Area",
+    "sector": "Sector",
+    "auditor": "Auditor",
+    "checklistTemplate": "Checklist Template"
+  }

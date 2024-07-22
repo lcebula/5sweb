@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import store from '../store';
 import Login from '../components/Login.vue';
 import Home from '../components/Home.vue';
 import ManageAreas from '../components/Admin/ManageAreas.vue';
@@ -8,37 +7,49 @@ import ManageAudits from '../components/Admin/ManageAudits.vue';
 import ManageUsers from '../components/Admin/ManageUsers.vue';
 
 const routes = [
-    { path: '/', component: Login, name: 'login' },
-    { path: '/home', component: Home, name: 'home' },
-    { path: '/admin/areas', component: ManageAreas, name: 'manage-areas', meta: { requiresRole: 'admin' } },
-    { path: '/admin/sectors', component: ManageSectors, name: 'manage-sectors', meta: { requiresRole: 'admin' } },
-    { path: '/admin/audits', component: ManageAudits, name: 'manage-audits', meta: { requiresRole: 'admin' } },
-    { path: '/admin/users', component: ManageUsers, name: 'manage-users', meta: { requiresRole: 'admin' } }
+  { path: '/', component: Login, name: 'login' },
+  { path: '/home', component: Home, name: 'home' },
+  { path: '/admin/areas', component: ManageAreas, name: 'manage-areas' },
+  { path: '/admin/sectors', component: ManageSectors, name: 'manage-sectors' },
+  { path: '/admin/audits', component: ManageAudits, name: 'manage-audits' },
+  { path: '/admin/users', component: ManageUsers, name: 'manage-users' }
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes
+  history: createWebHistory(),
+  routes
 });
 
-router.beforeEach(async (to, from, next) => {
-    const publicPages = ['/', '/login'];
-    const authRequired = !publicPages.includes(to.path);
-    const loggedIn = localStorage.getItem('token');
+// Verificação de autenticação e autorização
+router.beforeEach((to, from, next) => {
+  const publicPages = ['/', '/login'];
+  const authRequired = !publicPages.includes(to.path);
+  const loggedIn = localStorage.getItem('token');
 
-    if (authRequired && !loggedIn) {
-        return next('/');
-    }
+  if (authRequired && !loggedIn) {
+    return next('/');
+  }
 
-    if (to.meta.requiresRole) {
-        await store.dispatch('fetchUser'); // Ensure user is loaded
-        const roles = store.state.roles;
-        if (!roles.includes(to.meta.requiresRole)) {
-            return next('/home'); // Redirect to home if user doesn't have the appropriate role
-        }
-    }
-
+  // Verificação de autorização
+  const roleRequired = to.meta.role;
+  if (roleRequired && loggedIn) {
+    axios.get('/me', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    }).then(response => {
+      const roles = response.data.user.roles.map(role => role.name);
+      if (roles.includes(roleRequired)) {
+        next();
+      } else {
+        next('/home');
+      }
+    }).catch(() => {
+      next('/');
+    });
+  } else {
     next();
+  }
 });
 
 export default router;
