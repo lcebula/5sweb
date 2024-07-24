@@ -20,10 +20,14 @@
               <td colspan="7">{{ $t('noAudits') }}</td>
             </tr>
             <tr v-for="audit in audits" :key="audit.id">
-              <td>{{ audit.audit_date }}</td>
+              <td>{{ formattedDate(audit.audit_date) }}</td>
               <td>{{ audit.area.name }}</td>
               <td>{{ audit.sector.name }}</td>
-              <td>{{ $t(audit.status) }}</td>
+              <td>
+                <span :class="statusClass(audit.status)">
+                  <i :class="statusIcon(audit.status)"></i> {{ $t(audit.status) }}
+                </span>
+              </td>
               <td>{{ audit.checklist_template.name }}</td>
               <td>{{ audit.observations }}</td>
               <td><AuditItem :audit="audit" /></td>
@@ -38,6 +42,8 @@
   import axios from 'axios';
   import Navbar from '../Navbar.vue';
   import AuditItem from './AuditItem.vue';
+  import { useI18n } from 'vue-i18n';
+  import moment from 'moment';
 
   export default {
     components: {
@@ -67,6 +73,23 @@
             console.error('Error fetching audits:', error);
           });
       },
+      formattedDate(date) {
+        return moment(date).format('L');
+      },
+      statusClass(status) {
+        return {
+          'text-danger': status === 'pending',
+          'text-primary': status === 'inProgress',
+          'text-success': status === 'completed',
+        };
+      },
+      statusIcon(status) {
+        return {
+          'fas fa-exclamation-circle': status === 'pending',
+          'fas fa-spinner': status === 'inProgress',
+          'fas fa-check-circle': status === 'completed',
+        };
+      },
     },
   };
   </script>
@@ -77,5 +100,14 @@
   }
   .table {
     margin-top: 20px;
+  }
+  .text-danger {
+    color: red;
+  }
+  .text-primary {
+    color: blue;
+  }
+  .text-success {
+    color: green;
   }
   </style>

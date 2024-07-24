@@ -10,7 +10,7 @@
               <button type="button" class="btn-close" @click="closeModal"></button>
             </div>
             <div class="modal-body">
-              <p><strong>{{ $t('auditDate') }}:</strong> {{ audit.audit_date }}</p>
+              <p><strong>{{ $t('auditDate') }}:</strong> {{ formattedDate(audit.audit_date) }}</p>
               <p><strong>{{ $t('area') }}:</strong> {{ audit.area.name }}</p>
               <p><strong>{{ $t('sector') }}:</strong> {{ audit.sector.name }}</p>
               <p><strong>{{ $t('status') }}:</strong> {{ $t(audit.status) }}</p>
@@ -40,77 +40,81 @@
         </div>
       </div>
     </div>
-  </template>
+</template>
 
-  <script>
-  import { reactive } from 'vue';
-  import axios from 'axios';
+<script>
+import { reactive } from 'vue';
+import axios from 'axios';
+import { useI18n } from 'vue-i18n';
 
-  export default {
-    props: {
-      audit: Object,
+export default {
+  props: {
+    audit: Object,
+  },
+  data() {
+    return {
+      showModal: false,
+      checklist: reactive({}),
+    };
+  },
+  computed: {
+    checklistItems() {
+      return this.audit.checklist_template?.items || [];
     },
-    data() {
-      return {
-        showModal: false,
-        checklist: reactive({}),
-      };
+  },
+  methods: {
+    showDetails() {
+      this.showModal = true;
     },
-    computed: {
-      checklistItems() {
-        return this.audit.checklist_template?.items || [];
-      },
+    closeModal() {
+      this.showModal = false;
     },
-    methods: {
-      showDetails() {
-        this.showModal = true;
-      },
-      closeModal() {
-        this.showModal = false;
-      },
-      submitChecklist() {
-        const items = this.checklistItems.map(item => ({
-          item: item.item,
-          concept: item.concept,
-          score: this.checklist[item.id]?.score,
-        }));
+    submitChecklist() {
+      const items = this.checklistItems.map(item => ({
+        item: item.item,
+        concept: item.concept,
+        score: this.checklist[item.id]?.score,
+      }));
 
-        axios
-          .post(`/audits/${this.audit.id}/checklist`, { items }, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-          })
-          .then((response) => {
-            alert(this.$t('checklistSaved'));
-            this.closeModal();
-          })
-          .catch((error) => {
-            console.error('Error saving checklist:', error);
-          });
-      },
-      initializeChecklist() {
-        if (this.audit && this.audit.checklist_template && this.audit.checklist_template.items) {
-          this.audit.checklist_template.items.forEach((item) => {
-            this.checklist[item.id] = { score: '' };
-          });
-        }
+      axios
+        .post(`/audits/${this.audit.id}/checklist`, { items }, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        })
+        .then((response) => {
+          alert(this.$t('checklistSaved'));
+          this.closeModal();
+        })
+        .catch((error) => {
+          console.error('Error saving checklist:', error);
+        });
+    },
+    initializeChecklist() {
+      if (this.audit && this.audit.checklist_template && this.audit.checklist_template.items) {
+        this.audit.checklist_template.items.forEach((item) => {
+          this.checklist[item.id] = { score: '' };
+        });
+      }
+    },
+    formattedDate(date) {
+      return this.$d(new Date(date), 'long');
+    }
+  },
+  watch: {
+    audit: {
+      immediate: true,
+      handler() {
+        this.initializeChecklist();
       },
     },
-    watch: {
-      audit: {
-        immediate: true,
-        handler() {
-          this.initializeChecklist();
-        },
-      },
-    },
-  };
-  </script>
+  },
+};
+</script>
 
-  <style scoped>
-  .modal.fade.show {
-    display: block;
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-  </style>
+<style scoped>
+.modal.fade.show {
+  display: block;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+</style>

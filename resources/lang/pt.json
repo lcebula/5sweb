@@ -60,5 +60,7 @@
     "details": "Detalhes",
     "close": "Fechar",
     "fillChecklist": "Preencher Checklist",
-    "checklistSaved": "Checklist salvo com sucesso"
+    "checklistSaved": "Checklist salvo com sucesso",
+    "evidence": "Evidência",
+    "score": "Pontuação"
 }

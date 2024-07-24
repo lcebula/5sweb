@@ -26,9 +26,12 @@
               <td>{{ audit.area.name }}</td>
               <td>{{ audit.sector.name }}</td>
               <td>{{ audit.user.name }}</td>
-              <td>{{ audit.audit_date }}</td>
+              <td>{{ formattedDate(audit.audit_date) }}</td>
               <td>{{ audit.checklist_template.name }}</td>
-              <td>{{ $t(audit.status) }}</td>
+              <td>
+                <i :class="statusIconClass(audit.status)"></i>
+                {{ $t(audit.status) }}
+              </td>
               <td>{{ audit.observations }}</td>
               <td class="text-end">
                 <button class="btn btn-warning btn-icon" @click="editAudit(audit)">
@@ -126,6 +129,8 @@
   <script>
   import Navbar from '../Navbar.vue';
   import LoadingSpinner from '../LoadingSpinner.vue';
+  import { useI18n } from 'vue-i18n';
+  import moment from 'moment';
 
   export default {
     components: {
@@ -288,6 +293,21 @@
       },
       closeDeleteModal() {
         this.showDeleteModal = false;
+      },
+      formattedDate(date) {
+        return this.$d(new Date(date), 'long');
+      },
+      statusIconClass(status) {
+        switch (status) {
+          case 'pending':
+            return 'fas fa-circle text-danger';
+          case 'in_progress':
+            return 'fas fa-circle text-primary';
+          case 'completed':
+            return 'fas fa-circle text-success';
+          default:
+            return '';
+        }
       }
     },
     created() {

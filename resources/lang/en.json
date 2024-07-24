@@ -4,7 +4,7 @@
     "loginFailed": "Login failed. Please check your credentials and try again.",
     "home": "Home",
     "logout": "Logout",
-    "admin": "Administration",
+    "admin": "Admin",
     "manageAreas": "Manage Areas",
     "manageSectors": "Manage Sectors",
     "manageAudits": "Manage Audits",
@@ -18,7 +18,7 @@
     "addUser": "Add User",
     "editUser": "Edit User",
     "deleteUser": "Delete User",
-    "confirmDelete": "Confirm Deletion",
+    "confirmDelete": "Confirm Delete",
     "confirmDeleteMessage": "Are you sure you want to delete?",
     "save": "Save",
     "cancel": "Cancel",
@@ -40,7 +40,7 @@
     "sector": "Sector",
     "auditor": "Auditor",
     "checklistTemplate": "Checklist Template",
-    "manageChecklistTemplates": "Manage Checklists",
+    "manageChecklistTemplates": "Manage Checklist Templates",
     "addTemplate": "Add Template",
     "editTemplate": "Edit Template",
     "items": "Items",
@@ -60,6 +60,7 @@
     "details": "Details",
     "close": "Close",
     "fillChecklist": "Fill Checklist",
-    "checklistSaved": "Checklist saved successfully"
-
+    "checklistSaved": "Checklist saved successfully",
+    "evidence": "Evidence",
+    "score": "Score"
 }
