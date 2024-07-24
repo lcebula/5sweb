@@ -7,6 +7,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
+            <!-- Admin Menu -->
             <li class="nav-item dropdown" v-if="isAdmin">
               <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 {{ $t('admin') }}
@@ -16,8 +17,19 @@
                 <li><router-link class="dropdown-item" :to="{ name: 'manage-sectors' }">{{ $t('manageSectors') }}</router-link></li>
                 <li><router-link class="dropdown-item" :to="{ name: 'manage-audits' }">{{ $t('manageAudits') }}</router-link></li>
                 <li><router-link class="dropdown-item" :to="{ name: 'manage-users' }">{{ $t('manageUsers') }}</router-link></li>
+                <li><router-link class="dropdown-item" :to="{ name: 'manage-checklist-templates' }">{{ $t('manageChecklistTemplates') }}</router-link></li>
               </ul>
             </li>
+            <!-- Auditor Menu -->
+            <li class="nav-item dropdown" v-if="isAuditor">
+              <a class="nav-link dropdown-toggle" href="#" id="auditorDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ $t('audit') }}
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="auditorDropdown">
+                <li><router-link class="dropdown-item" :to="{ name: 'my-audits' }">{{ $t('myAudits') }}</router-link></li>
+              </ul>
+            </li>
+            <!-- Logout -->
             <li class="nav-item">
               <a class="nav-link" href="#" @click.prevent="logout">{{ $t('logout') }}</a>
             </li>
@@ -34,6 +46,7 @@
     data() {
       return {
         isAdmin: false,
+        isAuditor: false,
       };
     },
     methods: {
@@ -41,7 +54,7 @@
         localStorage.removeItem('token');
         this.$router.push({ name: 'login' });
       },
-      checkAdminRole() {
+      checkRoles() {
         const token = localStorage.getItem('token');
         if (token) {
           axios.get('/me', {
@@ -49,19 +62,22 @@
               Authorization: `Bearer ${token}`,
             },
           })
-            .then(response => {
-              const roles = response.data.user.roles || [];
-              this.isAdmin = roles.some(role => role.name === 'admin');
-            })
-            .catch(error => {
-              console.error('Error fetching user roles:', error);
-              this.isAdmin = false;
-            });
+          .then(response => {
+            const roles = response.data.user.roles || [];
+            console.log('User roles:', roles);  // Adicione este log
+            this.isAdmin = roles.some(role => role.name === 'admin');
+            this.isAuditor = roles.some(role => role.name === 'auditor');
+          })
+          .catch(error => {
+            console.error('Error fetching user roles:', error);
+            this.isAdmin = false;
+            this.isAuditor = false;
+          });
         }
       },
     },
     created() {
-      this.checkAdminRole();
+      this.checkRoles();
     },
   };
   </script>
