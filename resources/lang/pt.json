@@ -63,5 +63,10 @@
     "checklistSaved": "Checklist salvo com sucesso",
     "evidence": "Evidência",
     "score": "Pontuação",
-    "confirmFinalizeMessage": "Você tem certeza de que deseja finalizar essa auditoria? Essa ação não pode ser desfeita!"
+    "confirmFinalizeMessage": "Você tem certeza de que deseja finalizar essa auditoria? Essa ação não pode ser desfeita!",
+    "inProgress": "Em Progresso",
+    "complete": "Concluído",
+    "confirm": "Confirmar",
+    "checklist": "Lista de Verificação"
+
 }

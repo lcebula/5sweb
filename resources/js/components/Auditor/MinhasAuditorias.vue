@@ -36,7 +36,7 @@
               <td><AuditItem :audit="audit" /></td>
               <td>
                 <div v-if="audit.status !== 'completed'" class="action-buttons">
-                  <select @change="updateAuditStatus(audit, $event.target.value)" v-model="audit.status" class="form-select form-select-sm">
+                  <select @change="handleStatusChange(audit, $event.target.value)" :value="audit.status" class="form-select form-select-sm">
                     <option value="pending">{{ $t('pending') }}</option>
                     <option value="in_progress">{{ $t('inProgress') }}</option>
                     <option value="completed">{{ $t('complete') }}</option>
@@ -84,6 +84,7 @@
         audits: [],
         showConfirmModal: false,
         auditToFinalize: null,
+        newStatus: null,
       };
     },
     created() {
@@ -121,6 +122,13 @@
           'fas fa-check-circle': status === 'completed',
         };
       },
+      handleStatusChange(audit, newStatus) {
+        if (newStatus === 'completed') {
+          this.confirmFinalize(audit, newStatus);
+        } else {
+          this.updateAuditStatus(audit, newStatus);
+        }
+      },
       updateAuditStatus(audit, newStatus) {
         axios
           .put(`/audits/${audit.id}`, { status: newStatus }, {
@@ -138,17 +146,19 @@
             console.error('Error updating audit status:', error);
           });
       },
-      confirmFinalize(audit) {
+      confirmFinalize(audit, newStatus) {
         this.auditToFinalize = audit;
+        this.newStatus = newStatus;
         this.showConfirmModal = true;
       },
       closeConfirmModal() {
         this.showConfirmModal = false;
         this.auditToFinalize = null;
+        this.newStatus = null;
       },
       finalizeAudit() {
         if (this.auditToFinalize) {
-          this.updateAuditStatus(this.auditToFinalize, 'completed');
+          this.updateAuditStatus(this.auditToFinalize, this.newStatus);
           this.closeConfirmModal();
         }
       },
