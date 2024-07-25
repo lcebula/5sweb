@@ -62,5 +62,6 @@
     "fillChecklist": "Preencher Checklist",
     "checklistSaved": "Checklist salvo com sucesso",
     "evidence": "Evidência",
-    "score": "Pontuação"
+    "score": "Pontuação",
+    "confirmFinalizeMessage": "Você tem certeza de que deseja finalizar essa auditoria? Essa ação não pode ser desfeita!"
 }

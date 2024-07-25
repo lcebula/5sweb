@@ -62,5 +62,6 @@
     "fillChecklist": "Llenar Lista de Verificación",
     "checklistSaved": "Lista de verificación guardada con éxito",
     "evidence": "Evidencia",
-    "score": "Puntuación"
+    "score": "Puntuación",
+    "confirmFinalizeMessage": "¿Está seguro de que desea finalizar esta auditoría? ¡Esta acción no se puede deshacer!"
 }

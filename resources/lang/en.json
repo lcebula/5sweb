@@ -62,5 +62,6 @@
     "fillChecklist": "Fill Checklist",
     "checklistSaved": "Checklist saved successfully",
     "evidence": "Evidence",
-    "score": "Score"
+    "score": "Score",
+    "confirmFinalizeMessage": "Are you sure you want to finalize this audit? This action cannot be undone!"
 }
