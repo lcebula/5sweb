@@ -217,7 +217,7 @@ export default {
                     },
                 })
                 .then(response => {
-                    console.log('Filled audit loaded:', response.data);
+                    console.log('Filled audit loaded:', response.data); // Adicione este log
                     state.filledAudit = response.data;
                     initializeChecklist();
                     // Load photos for each item
@@ -236,27 +236,29 @@ export default {
                 });
         };
 
+
         const initializeChecklist = () => {
-            if (props.audit && props.audit.checklist_template && props.audit.checklist_template.items) {
-                props.audit.checklist_template.items.forEach(item => {
-                    const filledItem = state.filledAudit.items.find(i => i.item === item.item);
-                    if (filledItem) {
-                        state.checklist[filledItem.id] = { score: '' };
-                    }
-                });
-                if (state.filledAudit && state.filledAudit.items) {
-                    state.filledAudit.items.forEach(item => {
-                        const checklistItem = props.audit.checklist_template.items.find(it => it.item === item.item);
-                        if (checklistItem) {
-                            if (!state.checklist[item.id]) {
-                                state.checklist[item.id] = {};
-                            }
-                            state.checklist[item.id].score = item.score;
-                        }
-                    });
+        console.log('Initializing checklist'); // Adicione este log
+        if (props.audit && props.audit.checklist_template && props.audit.checklist_template.items) {
+            // Inicialize todos os itens do checklist
+            props.audit.checklist_template.items.forEach(item => {
+                if (!state.checklist[item.id]) {
+                    state.checklist[item.id] = { score: '' };
                 }
+            });
+
+            // Preencha o estado com os itens preenchidos
+            if (state.filledAudit && state.filledAudit.items) {
+                state.filledAudit.items.forEach(item => {
+                    if (!state.checklist[item.id]) {
+                        state.checklist[item.id] = {};
+                    }
+                    state.checklist[item.id].score = item.score;
+                });
             }
-        };
+        }
+
+    };
 
         const getScore = itemId => {
             const checklistItem = props.audit.checklist_template.items.find(it => it.id === itemId);
