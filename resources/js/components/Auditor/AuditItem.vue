@@ -10,7 +10,7 @@
                         <button type="button" class="btn-close" @click="closeModal"></button>
                     </div>
                     <div class="modal-body">
-                        <div v-if="loadingData || loadingPhotos" class="loading-spinner">
+                        <div v-if="loadingData" class="loading-spinner">
                             <div class="spinner-border" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
@@ -20,10 +20,13 @@
                                 <h3>{{ $t('fillChecklist') }}</h3>
                                 <form @submit.prevent="submitChecklist">
                                     <div v-for="item in filledAuditItems" :key="item.id" class="form-group">
-                                        <label :for="'item-' + item.id" v-html="nl2br(item.item)"></label>
-                                        <select :id="'item-' + item.id" v-model="checklist[item.id].score" class="form-control" @change="saveItemScore(item.id)">
-                                            <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
-                                        </select>
+                                        <p v-html="formatDescription(item.item)"></p>
+                                        <div class="mt-2">
+                                            <label :for="'score-' + item.id" class="form-label">{{ $t('score') }}</label>
+                                            <select :id="'score-' + item.id" v-model="checklist[item.id].score" class="form-control" @change="updateScore(item.id, checklist[item.id].score)">
+                                                <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
+                                            </select>
+                                        </div>
                                         <input type="file" @change="onFileChange($event, item.id)" multiple />
                                         <div v-if="photos[item.id]" class="thumbnail-container">
                                             <div v-for="photo in photos[item.id]" :key="photo.id" class="photo">
@@ -32,12 +35,13 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <button type="submit" class="btn btn-primary save-button">{{ $t('save') }}</button>
                                 </form>
                             </div>
                             <div v-else>
                                 <h3>{{ $t('checklist') }}</h3>
                                 <div v-for="item in filledAuditItems" :key="item.id" class="form-group">
-                                    <label :for="'item-' + item.id" v-html="nl2br(item.item)"></label>
+                                    <p v-html="formatDescription(item.item)"></p>
                                     <p class="form-control-static">{{ getScore(item.id) }}</p>
                                     <div>
                                         <h5>{{ $t('photos') }}</h5>
@@ -77,7 +81,6 @@ export default {
         const state = reactive({
             showModal: false,
             loadingData: true, // Estado de carregamento
-            loadingPhotos: true, // Estado de carregamento de fotos
             checklist: {},
             filledAudit: null,
             files: {}, // To store files for each item
@@ -90,11 +93,8 @@ export default {
             return state.filledAudit ? state.filledAudit.items : [];
         });
 
-        const nl2br = (str) => {
-            if (typeof str === 'string') {
-                return str.replace(/\n/g, '<br />');
-            }
-            return str;
+        const formatDescription = (description) => {
+            return description.replace(/\n/g, '<br>');
         };
 
         const onFileChange = (event, itemId) => {
@@ -145,9 +145,9 @@ export default {
                 .then(response => {
                     console.log('Photos loaded for item:', itemId, response.data);
                     state.photos[itemId] = response.data;
-                    if (allPhotosLoaded()) {
-                        state.loadingPhotos = false; // Ocultar o spinner após carregar as fotos
-                    }
+                    state.photos[itemId].forEach(photo => {
+                        console.log('Photo URL:', getPhotoUrl(photo.file_path));
+                    });
                 })
                 .catch(error => {
                     console.error('Error loading photos:', error);
@@ -157,7 +157,6 @@ export default {
         const showDetails = () => {
             console.log('Showing details for audit:', props.audit.id);
             state.loadingData = true; // Mostrar o spinner ao abrir a modal
-            state.loadingPhotos = true; // Mostrar o spinner para fotos ao abrir a modal
             loadFilledAudit();
             state.showModal = true;
         };
@@ -204,39 +203,22 @@ export default {
             }
         };
 
-        const saveItemScore = (itemId) => {
-            const item = filledAuditItems.value.find(i => i.id === itemId);
+        const updateScore = (itemId, score) => {
+            const item = filledAuditItems.value.find(it => it.id === itemId);
             if (item) {
-                const updatedItem = {
-                    item: item.item,
-                    concept: item.concept,
-                    score: state.checklist[item.id].score,
+                const checklistData = {
+                    filled_audit_item_id: itemId,
+                    score: score,
                 };
-                const filledAuditData = {
-                    audit_id: props.audit.id,
-                    template_name: props.audit.checklist_template.name,
-                    items: [updatedItem],
-                };
-                if (state.filledAudit) {
-                    axios
-                        .put(`/filled-audits/${state.filledAudit.id}`, filledAuditData)
-                        .then(response => {
-                            console.log('Item score saved:', response.data);
-                        })
-                        .catch(error => {
-                            console.error('Error saving item score:', error);
-                        });
-                } else {
-                    axios
-                        .post('/filled-audits', filledAuditData)
-                        .then(response => {
-                            state.filledAudit = response.data;
-                            console.log('Item score saved:', response.data);
-                        })
-                        .catch(error => {
-                            console.error('Error saving item score:', error);
-                        });
-                }
+
+                axios
+                    .put(`/checklist-items/${itemId}`, checklistData)
+                    .then(response => {
+                        console.log('Score updated:', response.data);
+                    })
+                    .catch(error => {
+                        console.error('Error updating score:', error);
+                    });
             }
         };
 
@@ -274,9 +256,6 @@ export default {
                     Object.keys(state.photos).forEach(itemId => {
                         state.photos[itemId] = state.photos[itemId].filter(photo => photo.id !== photoId);
                     });
-                    if (allPhotosLoaded()) {
-                        state.loadingPhotos = false; // Ocultar o spinner após carregar as fotos
-                    }
                 })
                 .catch(error => {
                     console.error('Error deleting photo:', error);
@@ -296,11 +275,10 @@ export default {
                     state.filledAudit = response.data;
                     initializeChecklist();
                     // Load photos for each item
-                    let requests = response.data.items.map(item => loadPhotos(item.id));
-                    Promise.all(requests).then(() => {
-                        state.loadingPhotos = false; // Ocultar o spinner após carregar as fotos
-                        state.loadingData = false; // Ocultar o spinner após carregar os dados
+                    response.data.items.forEach(item => {
+                        loadPhotos(item.id);
                     });
+                    state.loadingData = false; // Ocultar o spinner após carregar os dados
                 })
                 .catch(error => {
                     if (error.response && error.response.status === 404) {
@@ -349,20 +327,16 @@ export default {
             return url;
         };
 
-        const allPhotosLoaded = () => {
-            return Object.values(state.photos).every(photoArray => photoArray.every(photo => photo.file_path));
-        };
-
         return {
             ...toRefs(state),
             filledAuditItems,
-            nl2br,
+            formatDescription,
             onFileChange,
             uploadFile,
             showDetails,
             closeModal,
             submitChecklist,
-            saveItemScore,
+            updateScore,
             uploadFiles,
             deletePhoto,
             loadFilledAudit,
