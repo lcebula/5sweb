@@ -21,7 +21,7 @@
                                 <form @submit.prevent="submitChecklist">
                                     <div v-for="item in filledAuditItems" :key="item.id" class="form-group">
                                         <label :for="'item-' + item.id" v-html="nl2br(item.item)"></label>
-                                        <select :id="'item-' + item.id" v-model="checklist[item.id].score" class="form-control">
+                                        <select :id="'item-' + item.id" v-model="checklist[item.id].score" class="form-control" @change="saveItemScore(item.id)">
                                             <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
                                         </select>
                                         <input type="file" @change="onFileChange($event, item.id)" multiple />
@@ -32,7 +32,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary save-button">{{ $t('save') }}</button>
                                 </form>
                             </div>
                             <div v-else>
@@ -205,6 +204,42 @@ export default {
             }
         };
 
+        const saveItemScore = (itemId) => {
+            const item = filledAuditItems.value.find(i => i.id === itemId);
+            if (item) {
+                const updatedItem = {
+                    item: item.item,
+                    concept: item.concept,
+                    score: state.checklist[item.id].score,
+                };
+                const filledAuditData = {
+                    audit_id: props.audit.id,
+                    template_name: props.audit.checklist_template.name,
+                    items: [updatedItem],
+                };
+                if (state.filledAudit) {
+                    axios
+                        .put(`/filled-audits/${state.filledAudit.id}`, filledAuditData)
+                        .then(response => {
+                            console.log('Item score saved:', response.data);
+                        })
+                        .catch(error => {
+                            console.error('Error saving item score:', error);
+                        });
+                } else {
+                    axios
+                        .post('/filled-audits', filledAuditData)
+                        .then(response => {
+                            state.filledAudit = response.data;
+                            console.log('Item score saved:', response.data);
+                        })
+                        .catch(error => {
+                            console.error('Error saving item score:', error);
+                        });
+                }
+            }
+        };
+
         const uploadFiles = () => {
             Object.keys(state.files).forEach(itemId => {
                 Array.from(state.files[itemId]).forEach(file => {
@@ -327,6 +362,7 @@ export default {
             showDetails,
             closeModal,
             submitChecklist,
+            saveItemScore,
             uploadFiles,
             deletePhoto,
             loadFilledAudit,
