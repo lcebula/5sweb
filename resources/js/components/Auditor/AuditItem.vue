@@ -3,7 +3,7 @@
         <button class="btn btn-info btn-sm" @click="showDetails">{{ $t('details') }}</button>
 
         <div v-if="showModal" class="modal fade show" tabindex="-1" style="display: block;">
-            <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-dialog modal-dialog-scrollable modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">{{ audit.checklist_template.name }}</h5>
@@ -20,7 +20,10 @@
                                     </select>
                                     <input type="file" @change="onFileChange($event, item.id)" multiple />
                                     <div v-if="photos[item.id]" class="thumbnail-container">
-                                        <img v-for="photo in photos[item.id]" :key="photo.id" :src="getPhotoUrl(photo.file_path)" class="img-thumbnail" />
+                                        <div v-for="photo in photos[item.id]" :key="photo.id" class="photo">
+                                            <img :src="getPhotoUrl(photo.file_path)" alt="photo.description" class="img-thumbnail" />
+                                            <button type="button" class="btn btn-danger btn-sm delete-button" @click="deletePhoto(photo.id)">X</button>
+                                        </div>
                                     </div>
                                 </div>
                                 <button type="submit" class="btn btn-primary save-button">{{ $t('save') }}</button>
@@ -36,6 +39,7 @@
                                     <div v-if="photos[item.id] && photos[item.id].length">
                                         <div v-for="photo in photos[item.id]" :key="photo.id" class="photo">
                                             <img :src="getPhotoUrl(photo.file_path)" alt="photo.description" class="img-thumbnail" />
+                                            <button type="button" class="btn btn-danger btn-sm delete-button" @click="deletePhoto(photo.id)">X</button>
                                             <p>{{ photo.description }}</p>
                                         </div>
                                     </div>
@@ -208,6 +212,21 @@ export default {
             });
         };
 
+        const deletePhoto = photoId => {
+            axios
+                .delete(`/photos/${photoId}`)
+                .then(response => {
+                    console.log('Photo deleted:', response.data);
+                    // Remove the photo from the state
+                    Object.keys(state.photos).forEach(itemId => {
+                        state.photos[itemId] = state.photos[itemId].filter(photo => photo.id !== photoId);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error deleting photo:', error);
+                });
+        };
+
         const loadFilledAudit = () => {
             console.log('Loading filled audit for audit:', props.audit.id);
             axios
@@ -236,29 +255,27 @@ export default {
                 });
         };
 
-
         const initializeChecklist = () => {
-        console.log('Initializing checklist'); // Adicione este log
-        if (props.audit && props.audit.checklist_template && props.audit.checklist_template.items) {
-            // Inicialize todos os itens do checklist
-            props.audit.checklist_template.items.forEach(item => {
-                if (!state.checklist[item.id]) {
-                    state.checklist[item.id] = { score: '' };
-                }
-            });
-
-            // Preencha o estado com os itens preenchidos
-            if (state.filledAudit && state.filledAudit.items) {
-                state.filledAudit.items.forEach(item => {
+            console.log('Initializing checklist'); // Adicione este log
+            if (props.audit && props.audit.checklist_template && props.audit.checklist_template.items) {
+                // Inicialize todos os itens do checklist
+                props.audit.checklist_template.items.forEach(item => {
                     if (!state.checklist[item.id]) {
-                        state.checklist[item.id] = {};
+                        state.checklist[item.id] = { score: '' };
                     }
-                    state.checklist[item.id].score = item.score;
                 });
-            }
-        }
 
-    };
+                // Preencha o estado com os itens preenchidos
+                if (state.filledAudit && state.filledAudit.items) {
+                    state.filledAudit.items.forEach(item => {
+                        if (!state.checklist[item.id]) {
+                            state.checklist[item.id] = {};
+                        }
+                        state.checklist[item.id].score = item.score;
+                    });
+                }
+            }
+        };
 
         const getScore = itemId => {
             const checklistItem = props.audit.checklist_template.items.find(it => it.id === itemId);
@@ -282,6 +299,7 @@ export default {
             closeModal,
             submitChecklist,
             uploadFiles,
+            deletePhoto,
             loadFilledAudit,
             initializeChecklist,
             getScore,
@@ -295,6 +313,9 @@ export default {
 .modal.fade.show {
     display: block;
     background-color: rgba(0, 0, 0, 0.5);
+}
+.modal-dialog.modal-lg {
+    max-width: 80%;
 }
 .form-group {
     margin-bottom: 1rem;
@@ -310,12 +331,18 @@ export default {
     display: flex;
     align-items: center;
     margin-top: 10px;
+    position: relative;
 }
 .thumbnail-container {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 10px;
+}
+.delete-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
 }
 .loading-icon {
     display: flex;
