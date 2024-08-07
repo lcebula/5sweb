@@ -212,7 +212,7 @@ export default {
                 };
 
                 axios
-                    .put(`/checklist-items/${itemId}`, checklistData)
+                    .put(`/filled-audit-items/${itemId}`, checklistData)
                     .then(response => {
                         console.log('Score updated:', response.data);
                     })
