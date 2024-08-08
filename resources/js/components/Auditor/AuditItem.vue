@@ -21,13 +21,15 @@
                                 <form @submit.prevent="submitChecklist">
                                     <div v-for="item in filledAuditItems" :key="item.id" class="form-group">
                                         <p v-html="formatDescription(item.item)"></p>
-                                        <div class="mt-2">
+                                        <div class="mt-2 mb-3">
                                             <label :for="'score-' + item.id" class="form-label">{{ $t('score') }}</label>
                                             <select :id="'score-' + item.id" v-model="checklist[item.id].score" class="form-control" @change="updateScore(item.id, checklist[item.id].score)">
                                                 <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
                                             </select>
                                         </div>
-                                        <input type="file" @change="onFileChange($event, item.id)" multiple />
+                                        <div class="mb-3">
+                                            <input type="file" @change="onFileChange($event, item.id)" multiple class="form-control" />
+                                        </div>
                                         <div v-if="photos[item.id]" class="thumbnail-container">
                                             <div v-for="photo in photos[item.id]" :key="photo.id" class="photo">
                                                 <img :src="getPhotoUrl(photo.file_path, true)" alt="photo.description" class="img-thumbnail" />
@@ -47,7 +49,7 @@
                                         <h5>{{ $t('photos') }}</h5>
                                         <div v-if="photos[item.id] && photos[item.id].length">
                                             <div v-for="photo in photos[item.id]" :key="photo.id" class="photo">
-                                                <img :src="getPhotoUrl(photo.file_path)" alt="photo.description" class="img-thumbnail" />
+                                                <img :src="getPhotoUrl(photo.file_path, true)" alt="photo.description" class="img-thumbnail" />
                                                 <button type="button" class="btn btn-danger btn-sm delete-button" @click="deletePhoto(photo.id)">X</button>
                                                 <p>{{ photo.description }}</p>
                                             </div>
@@ -68,6 +70,7 @@
         </div>
     </div>
 </template>
+
 
 <script>
 import { reactive, toRefs, computed } from 'vue';
@@ -360,7 +363,7 @@ export default {
     max-width: 80%;
 }
 .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 .save-button {
     margin-top: 1rem;
@@ -374,6 +377,10 @@ export default {
     align-items: center;
     margin-top: 10px;
     position: relative;
+    border: 1px solid #ddd; /* Borda ao redor do thumbnail */
+    padding: 5px; /* Espaço interno para melhor visualização */
+    background-color: #f9f9f9; /* Cor de fundo para destaque */
+    border-radius: 5px; /* Borda arredondada */
 }
 .thumbnail-container {
     display: flex;
@@ -397,5 +404,11 @@ export default {
     align-items: center;
     justify-content: center;
     height: 100%;
+}
+.mt-2 {
+    margin-top: 1rem;
+}
+.mb-3 {
+    margin-bottom: 1rem;
 }
 </style>
