@@ -67,5 +67,8 @@
     "inProgress": "En Progreso",
     "complete": "Completado",
     "confirm": "Confirmar",
-    "checklist": "Lista de Verificación"
+    "checklist": "Lista de Verificación",
+    "uploadPhotos": "Subir Fotos",
+    "photos": "Fotos",
+    "noPhotos": "No hay fotos disponibles"
 }

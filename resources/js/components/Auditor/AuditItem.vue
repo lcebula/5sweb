@@ -19,7 +19,7 @@
                             <div v-if="audit.status !== 'completed'">
                                 <h3>{{ $t('fillChecklist') }}</h3>
                                 <form @submit.prevent="submitChecklist">
-                                    <div v-for="item in filledAuditItems" :key="item.id" class="form-group">
+                                    <div v-for="item in filledAuditItems" :key="item.id" class="item-box">
                                         <p v-html="formatDescription(item.item)"></p>
                                         <div class="mt-2 mb-3">
                                             <label :for="'score-' + item.id" class="form-label">{{ $t('score') }}</label>
@@ -28,6 +28,7 @@
                                             </select>
                                         </div>
                                         <div class="mb-3">
+                                            <label class="form-label mt-2">{{ $t('uploadPhotos') }}</label>
                                             <input type="file" @change="onFileChange($event, item.id)" multiple class="form-control" />
                                         </div>
                                         <div v-if="photos[item.id]" class="thumbnail-container">
@@ -42,7 +43,7 @@
                             </div>
                             <div v-else>
                                 <h3>{{ $t('checklist') }}</h3>
-                                <div v-for="item in filledAuditItems" :key="item.id" class="form-group">
+                                <div v-for="item in filledAuditItems" :key="item.id" class="item-box">
                                     <p v-html="formatDescription(item.item)"></p>
                                     <p class="form-control-static">{{ getScore(item.id) }}</p>
                                     <div>
@@ -70,7 +71,6 @@
         </div>
     </div>
 </template>
-
 
 <script>
 import { reactive, toRefs, computed } from 'vue';
@@ -131,26 +131,19 @@ export default {
                     },
                 })
                 .then(response => {
-                    console.log('File uploaded:', response.data);
                     state.loading[itemId] = false; // Set loading state to false
                     loadPhotos(itemId); // Reload photos to display the newly uploaded thumbnail
                 })
                 .catch(error => {
-                    console.error('Error uploading file:', error);
                     state.loading[itemId] = false; // Set loading state to false
                 });
         };
 
         const loadPhotos = itemId => {
-            console.log('Loading photos for item:', itemId);
             axios
                 .get(`/photos?filled_audit_item_id=${itemId}`)
                 .then(response => {
-                    console.log('Photos loaded for item:', itemId, response.data);
                     state.photos[itemId] = response.data;
-                    state.photos[itemId].forEach(photo => {
-                        console.log('Photo URL:', getPhotoUrl(photo.file_path));
-                    });
                 })
                 .catch(error => {
                     console.error('Error loading photos:', error);
@@ -158,7 +151,6 @@ export default {
         };
 
         const showDetails = () => {
-            console.log('Showing details for audit:', props.audit.id);
             state.loadingData = true; // Mostrar o spinner ao abrir a modal
             loadFilledAudit();
             state.showModal = true;
@@ -216,9 +208,7 @@ export default {
 
                 axios
                     .put(`/filled-audit-items/${itemId}`, checklistData)
-                    .then(response => {
-                        console.log('Score updated:', response.data);
-                    })
+                    .then(response => {})
                     .catch(error => {
                         console.error('Error updating score:', error);
                     });
@@ -240,7 +230,6 @@ export default {
                             },
                         })
                         .then(response => {
-                            console.log('File uploaded:', response.data);
                             loadPhotos(itemId); // Reload photos to display the newly uploaded thumbnail
                         })
                         .catch(error => {
@@ -254,7 +243,6 @@ export default {
             axios
                 .delete(`/photos/${photoId}`)
                 .then(response => {
-                    console.log('Photo deleted:', response.data);
                     // Remove the photo from the state
                     Object.keys(state.photos).forEach(itemId => {
                         state.photos[itemId] = state.photos[itemId].filter(photo => photo.id !== photoId);
@@ -266,7 +254,6 @@ export default {
         };
 
         const loadFilledAudit = () => {
-            console.log('Loading filled audit for audit:', props.audit.id);
             axios
                 .get(`/filled-audits/${props.audit.id}`, {
                     headers: {
@@ -274,7 +261,6 @@ export default {
                     },
                 })
                 .then(response => {
-                    console.log('Filled audit loaded:', response.data); // Adicione este log
                     state.filledAudit = response.data;
                     initializeChecklist();
                     // Load photos for each item
@@ -285,7 +271,6 @@ export default {
                 })
                 .catch(error => {
                     if (error.response && error.response.status === 404) {
-                        console.warn('No filled audit found:', error);
                         state.filledAudit = null;
                         initializeChecklist();
                         state.loadingData = false; // Ocultar o spinner após carregar os dados
@@ -296,7 +281,6 @@ export default {
         };
 
         const initializeChecklist = () => {
-            console.log('Initializing checklist'); // Adicione este log
             if (props.audit && props.audit.checklist_template && props.audit.checklist_template.items) {
                 // Inicialize todos os itens do checklist
                 props.audit.checklist_template.items.forEach(item => {
@@ -327,11 +311,8 @@ export default {
             const serverAddress = 'http://127.0.0.1:8001';
             const fileName = filePath.split('/').pop();
             const prefix = isThumbnail ? 'thumb_' : '';
-            const url = `${serverAddress}/storage/photos/${prefix}${fileName}`;
-            console.log('Photo URL:', url);
-            return url;
+            return `${serverAddress}/storage/photos/${prefix}${fileName}`;
         };
-
 
         return {
             ...toRefs(state),
@@ -410,5 +391,13 @@ export default {
 }
 .mb-3 {
     margin-bottom: 1rem;
+}
+.item-box {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 </style>
