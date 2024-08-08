@@ -30,7 +30,7 @@
                                         <input type="file" @change="onFileChange($event, item.id)" multiple />
                                         <div v-if="photos[item.id]" class="thumbnail-container">
                                             <div v-for="photo in photos[item.id]" :key="photo.id" class="photo">
-                                                <img :src="getPhotoUrl(photo.file_path)" alt="photo.description" class="img-thumbnail" />
+                                                <img :src="getPhotoUrl(photo.file_path, true)" alt="photo.description" class="img-thumbnail" />
                                                 <button type="button" class="btn btn-danger btn-sm delete-button" @click="deletePhoto(photo.id)">X</button>
                                             </div>
                                         </div>
@@ -320,12 +320,15 @@ export default {
             return item ? item.score : '-';
         };
 
-        const getPhotoUrl = filePath => {
+        const getPhotoUrl = (filePath, isThumbnail = false) => {
             const serverAddress = 'http://127.0.0.1:8001';
-            const url = `${serverAddress}/storage/${filePath}`;
+            const fileName = filePath.split('/').pop();
+            const prefix = isThumbnail ? 'thumb_' : '';
+            const url = `${serverAddress}/storage/photos/${prefix}${fileName}`;
             console.log('Photo URL:', url);
             return url;
         };
+
 
         return {
             ...toRefs(state),
