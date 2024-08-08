@@ -33,12 +33,11 @@
                                         </div>
                                         <div v-if="photos[item.id]" class="thumbnail-container">
                                             <div v-for="photo in photos[item.id]" :key="photo.id" class="photo">
-                                                <img :src="getPhotoUrl(photo.file_path, true)" alt="photo.description" class="img-thumbnail" />
+                                                <img :src="getPhotoUrl(photo.file_path, true)" alt="photo.description" class="img-thumbnail" @click="openLightbox(photo.file_path)" />
                                                 <button type="button" class="btn btn-danger btn-sm delete-button" @click="deletePhoto(photo.id)">X</button>
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary save-button">{{ $t('save') }}</button>
                                 </form>
                             </div>
                             <div v-else>
@@ -50,7 +49,7 @@
                                         <h5>{{ $t('photos') }}</h5>
                                         <div v-if="photos[item.id] && photos[item.id].length">
                                             <div v-for="photo in photos[item.id]" :key="photo.id" class="photo">
-                                                <img :src="getPhotoUrl(photo.file_path, true)" alt="photo.description" class="img-thumbnail" />
+                                                <img :src="getPhotoUrl(photo.file_path, true)" alt="photo.description" class="img-thumbnail" @click="openLightbox(photo.file_path)" />
                                                 <button type="button" class="btn btn-danger btn-sm delete-button" @click="deletePhoto(photo.id)">X</button>
                                                 <p>{{ photo.description }}</p>
                                             </div>
@@ -68,6 +67,12 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Lightbox -->
+        <div v-if="lightboxVisible" class="lightbox" @click.self="closeLightbox">
+            <button class="btn-close btn-close-white" @click="closeLightbox"></button>
+            <img :src="lightboxImageUrl" class="lightbox-image" />
         </div>
     </div>
 </template>
@@ -92,6 +97,8 @@ export default {
             thumbnails: {}, // To store thumbnail URLs
             loading: {}, // To track loading state
             photos: {}, // To store loaded photos for each item
+            lightboxVisible: false,
+            lightboxImageUrl: '',
         });
 
         const filledAuditItems = computed(() => {
@@ -160,6 +167,16 @@ export default {
 
         const closeModal = () => {
             state.showModal = false;
+        };
+
+        const openLightbox = (filePath) => {
+            state.lightboxImageUrl = getPhotoUrl(filePath);
+            state.lightboxVisible = true;
+        };
+
+        const closeLightbox = () => {
+            state.lightboxVisible = false;
+            state.lightboxImageUrl = '';
         };
 
         const submitChecklist = () => {
@@ -323,6 +340,8 @@ export default {
             uploadFile,
             showDetails,
             closeModal,
+            openLightbox,
+            closeLightbox,
             submitChecklist,
             updateScore,
             uploadFiles,
@@ -349,10 +368,12 @@ export default {
 }
 .save-button {
     margin-top: 1rem;
+    display: none; /* Esconde o botão de salvar */
 }
 .img-thumbnail {
     max-width: 100px;
     margin-right: 10px;
+    cursor: pointer; /* Adiciona cursor de ponteiro para thumbnails */
 }
 .photo {
     display: flex;
@@ -400,5 +421,32 @@ export default {
     margin-bottom: 20px;
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1060; /* Aumenta o z-index para garantir que fique acima da modal */
+}
+.lightbox-image {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 10px;
+}
+.btn-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
 }
 </style>
