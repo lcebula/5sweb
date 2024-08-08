@@ -81,6 +81,8 @@ export default {
         audit: Object,
     },
     setup(props) {
+        const baseURL = process.env.VUE_APP_BASE_URL || 'http://127.0.0.1:8001';
+
         const state = reactive({
             showModal: false,
             loadingData: true, // Estado de carregamento
@@ -308,10 +310,9 @@ export default {
         };
 
         const getPhotoUrl = (filePath, isThumbnail = false) => {
-            const serverAddress = 'http://127.0.0.1:8001';
             const fileName = filePath.split('/').pop();
             const prefix = isThumbnail ? 'thumb_' : '';
-            return `${serverAddress}/storage/photos/${prefix}${fileName}`;
+            return `${baseURL}/storage/photos/${prefix}${fileName}`;
         };
 
         return {
