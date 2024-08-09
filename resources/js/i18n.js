@@ -9,10 +9,17 @@ const messages = {
   pt: pt
 };
 
+const datetimeFormats = {
+  en: en.dateTimeFormats,
+  es: es.dateTimeFormats,
+  pt: pt.dateTimeFormats
+};
+
 const i18n = createI18n({
-  locale: 'en', // Idioma padrão
+  locale: 'pt', // Idioma padrão
   fallbackLocale: 'en',
-  messages
+  messages,
+  datetimeFormats // Adiciona os formatos de data e hora
 });
 
 export default i18n;

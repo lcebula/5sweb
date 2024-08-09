@@ -295,8 +295,8 @@
         this.showDeleteModal = false;
       },
       formattedDate(date) {
-        return this.$d(new Date(date), 'long');
-      },
+        return this.$d(new Date(date), 'long'); // 'long' corresponde ao formato definido no JSON
+    },
       statusIconClass(status) {
         switch (status) {
           case 'pending':

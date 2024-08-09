@@ -16,47 +16,28 @@
                             </div>
                         </div>
                         <div v-else>
-                            <div v-if="audit.status !== 'completed'">
-                                <h3>{{ $t('fillChecklist') }}</h3>
-                                <form @submit.prevent="submitChecklist">
-                                    <div v-for="item in filledAuditItems" :key="item.id" class="item-box">
-                                        <p v-html="formatDescription(item.item)"></p>
-                                        <div class="mt-2 mb-3">
-                                            <label :for="'score-' + item.id" class="form-label">{{ $t('score') }}</label>
-                                            <select :id="'score-' + item.id" v-model="checklist[item.id].score" class="form-control" @change="updateScore(item.id, checklist[item.id].score)">
-                                                <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label mt-2">{{ $t('uploadPhotos') }}</label>
-                                            <input type="file" @change="onFileChange($event, item.id)" multiple class="form-control" />
-                                        </div>
-                                        <div v-if="photos[item.id]" class="thumbnail-container">
-                                            <div v-for="photo in photos[item.id]" :key="photo.id" class="photo">
-                                                <img :src="getPhotoUrl(photo.file_path, true)" alt="photo.description" class="img-thumbnail" @click="openLightbox(photo.file_path)" />
-                                                <button type="button" class="btn btn-danger btn-sm delete-button" @click="deletePhoto(photo.id)">X</button>
-                                            </div>
-                                        </div>
+                            <h3>{{ audit.status !== 'completed' ? $t('fillChecklist') : $t('checklist') }}</h3>
+                            <div v-for="item in filledAuditItems" :key="item.id" class="item-box">
+                                <p v-html="formatDescription(item.item)"></p>
+                                <div class="mt-2 mb-3">
+                                    <label :for="'score-' + item.id" class="form-label">{{ $t('score') }}</label>
+                                    <div v-if="audit.status !== 'completed'">
+                                        <select :id="'score-' + item.id" v-model="checklist[item.id].score" class="form-control" @change="updateScore(item.id, checklist[item.id].score)">
+                                            <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
+                                        </select>
                                     </div>
-                                </form>
-                            </div>
-                            <div v-else>
-                                <h3>{{ $t('checklist') }}</h3>
-                                <div v-for="item in filledAuditItems" :key="item.id" class="item-box">
-                                    <p v-html="formatDescription(item.item)"></p>
-                                    <p class="form-control-static">{{ getScore(item.id) }}</p>
-                                    <div>
-                                        <h5>{{ $t('photos') }}</h5>
-                                        <div v-if="photos[item.id] && photos[item.id].length">
-                                            <div v-for="photo in photos[item.id]" :key="photo.id" class="photo">
-                                                <img :src="getPhotoUrl(photo.file_path, true)" alt="photo.description" class="img-thumbnail" @click="openLightbox(photo.file_path)" />
-                                                <button type="button" class="btn btn-danger btn-sm delete-button" @click="deletePhoto(photo.id)">X</button>
-                                                <p>{{ photo.description }}</p>
-                                            </div>
-                                        </div>
-                                        <div v-else>
-                                            <p>{{ $t('noPhotos') }}</p>
-                                        </div>
+                                    <div v-else>
+                                        <input type="text" :id="'score-' + item.id" v-model="checklist[item.id].score" class="form-control" disabled />
+                                    </div>
+                                </div>
+                                <div class="mb-3" v-if="audit.status !== 'completed'">
+                                    <label class="form-label mt-2">{{ $t('uploadPhotos') }}</label>
+                                    <input type="file" @change="onFileChange($event, item.id)" multiple class="form-control" />
+                                </div>
+                                <div v-if="photos[item.id]" class="thumbnail-container">
+                                    <div v-for="photo in photos[item.id]" :key="photo.id" class="photo">
+                                        <img :src="getPhotoUrl(photo.file_path, true)" alt="photo.description" class="img-thumbnail" @click="openLightbox(photo.file_path)" />
+                                        <button v-if="audit.status !== 'completed'" type="button" class="btn btn-danger btn-sm delete-button" @click="deletePhoto(photo.id)">X</button>
                                     </div>
                                 </div>
                             </div>
@@ -322,6 +303,9 @@ export default {
 
         const getScore = itemId => {
             const checklistItem = props.audit.checklist_template.items.find(it => it.id === itemId);
+            if (!checklistItem) {
+                return '-';
+            }
             const item = state.filledAudit && state.filledAudit.items ? state.filledAudit.items.find(i => i.item === checklistItem.item) : null;
             return item ? item.score : '-';
         };

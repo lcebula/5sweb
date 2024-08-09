@@ -70,5 +70,12 @@
     "checklist": "Checklist",
     "uploadPhotos": "Upload Photos",
     "photos": "Photos",
-    "noPhotos": "No photos available"
+    "noPhotos": "No photos available",
+    "dateTimeFormats": {
+        "long": {
+            "year": "numeric",
+            "month": "long",
+            "day": "numeric"
+        }
+    }
 }

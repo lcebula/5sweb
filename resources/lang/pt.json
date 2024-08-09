@@ -70,6 +70,13 @@
     "checklist": "Lista de Verificação",
     "uploadPhotos": "Enviar Fotos",
     "photos": "Fotos",
-    "noPhotos": "Nenhuma foto disponível"
+    "noPhotos": "Nenhuma foto disponível",
+    "dateTimeFormats": {
+        "long": {
+            "year": "numeric",
+            "month": "long",
+            "day": "numeric"
 
+        }
+    }
 }
